@@ -4,24 +4,31 @@
         <h1>Nakupny zoznam</h1>
       </div>
 
-    <input v-model="newTodo" class="inputTask" placeholder="Add a new todo">
-    <button @click="addTodo" class="addButton">Add</button>
+    <input v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
+    <button @click="addTodo" class="add_button">Add</button>
     <ul>
       <li v-for="(todo, index) in todos" :key="index">
         {{ todo.text }}
-        <button @click="deleteTask(index)" class="xButton">X</button>
+        <button @click="deleteTask(index)" class="x_button">X</button>
       </li>
     </ul>
-    <div class="deletedTasks">
+    <div class="deleted_tasks">
       <div class="heading2">
         <h1>Deleted Tasks</h1>
       </div>
       <ul>
         <li v-for="(task, index) in deletedTasks" :key="index">
           {{ task.text }}
-          <button @click="deleteDeletedTask(index)" class="deleteDeletedButton">X</button>
+          <button @click="deleteDeletedTask(index)" class="delete_deleted_button">X</button>
         </li>
       </ul>
+    </div>
+    <button @click="getLists">Get Lists</button>
+    <div v-for="p in list" :key="p.id">
+      <li>
+        <h1>{{ p.task }}</h1>
+      </li>
+
     </div>
   </div>
 </template>
@@ -36,10 +43,12 @@ export default {
     return {
       newTodo: '',
       todos: [],
-      deletedTasks: []
+      deletedTasks: [],
+      list: []
     };
   },
   created() {
+  
     const savedTodos = localStorage.getItem('todos');
     if (savedTodos) {
       this.todos = JSON.parse(savedTodos);
@@ -51,6 +60,17 @@ export default {
     }
   },
   methods: {
+    getLists() {
+      fetch('http://localhost:3000/tasks', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(json => json.json())
+    .then(data => this.list = data)
+
+    },
     addTodo() {
       if (this.newTodo.trim() !== '') {
         this.todos.push({ text: this.newTodo });
@@ -103,13 +123,13 @@ a {
   color: antiquewhite ;
 }
 
-.inputTask {
+.input_task {
   padding: 10px;  
   border-radius: 8px;
   border: none;
 } 
 
-.addButton {
+.add_button {
   padding-left: 15px;
   padding-right: 15px;
   padding-top: 10px;
@@ -119,7 +139,7 @@ a {
   margin: 15px  
 }
 
-.xButton {
+.x_button {
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 2px;
@@ -129,11 +149,11 @@ a {
   margin-left: 15px;
 }
 
-.deletedTasks {
+.deleted_tasks {
   margin-top: 200px;
 }
 
-.deleteDeletedButton {
+.delete_deleted_button {
   padding-left: 5px;
   padding-right: 5px;
   padding-top: 2px;
@@ -141,5 +161,14 @@ a {
   border: none;
   border-radius: 2px;
   margin-left: 15px;
+}
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
 }
 </style>
