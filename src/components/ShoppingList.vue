@@ -1,8 +1,8 @@
 <template>
-    <div class="hello">
-      <div class="heading">
-        <h1>Nakupny zoznam</h1>
-      </div>
+  <div class="hello">
+    <div class="heading">
+      <h1>Nakupny zoznam</h1>
+    </div>
 
     <input v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
     <button @click="addTodo" class="add_button">Add</button>
@@ -23,17 +23,17 @@
         </li>
       </ul>
     </div>
-    <button @click="getLists">Get Lists</button>
-    <div v-for="p in list" :key="p.id">
-      <li>
-        <h1>{{ p.task }}</h1>
+    <div>
+      <li v-for="note in notes" :key="note.id">
+        <p>{{ note.description }}</p>
       </li>
-
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'HelloWorld',
   props: {
@@ -44,11 +44,11 @@ export default {
       newTodo: '',
       todos: [],
       deletedTasks: [],
-      list: []
+      api_url: 'http://localhost:5038/',
+      notes: []
     };
   },
   created() {
-  
     const savedTodos = localStorage.getItem('todos');
     if (savedTodos) {
       this.todos = JSON.parse(savedTodos);
@@ -60,21 +60,10 @@ export default {
     }
   },
   methods: {
-    getLists() {
-      fetch('http://localhost:3000/tasks', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    })
-    .then(json => json.json())
-    .then(data => this.list = data)
-
-    },
     addTodo() {
       if (this.newTodo.trim() !== '') {
         this.todos.push({ text: this.newTodo });
-        this.newTodo = ''; 
+        this.newTodo = '';
         this.saveTasks();
       }
     },
@@ -90,10 +79,19 @@ export default {
     saveTasks() {
       localStorage.setItem('todos', JSON.stringify(this.todos));
       localStorage.setItem('deletedTasks', JSON.stringify(this.deletedTasks));
+    },
+    async refreshData() {
+      axios.get(this.api_url + 'api/shoppinglist/GetNote').then((response) => {
+        this.notes = response.data;
+      });
     }
+  },
+  mounted() {
+    this.refreshData(); 
   }
 };
 </script>
+
 
 <style>
 h3 {
