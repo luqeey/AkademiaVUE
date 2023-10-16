@@ -48,38 +48,38 @@ export default {
       notes: []
     };
   },
-  created() {
-    const savedTodos = localStorage.getItem('todos');
-    if (savedTodos) {
-      this.todos = JSON.parse(savedTodos);
-    }
+  // created() {
+  //   const savedTodos = localStorage.getItem('todos');
+  //   if (savedTodos) {
+  //     this.todos = JSON.parse(savedTodos);
+  //   }
 
-    const savedDeletedTasks = localStorage.getItem('deletedTasks');
-    if (savedDeletedTasks) {
-      this.deletedTasks = JSON.parse(savedDeletedTasks);
-    }
-  },
+  //   const savedDeletedTasks = localStorage.getItem('deletedTasks');
+  //   if (savedDeletedTasks) {
+  //     this.deletedTasks = JSON.parse(savedDeletedTasks);
+  //   }
+  // },
   methods: {
     addTodo() {
       if (this.newTodo.trim() !== '') {
         this.todos.push({ text: this.newTodo });
         this.newTodo = '';
-        this.saveTasks();
+        // this.saveTasks();
       }
     },
     deleteTask(index) {
       const deletedTask = this.todos.splice(index, 1)[0];
       this.deletedTasks.push(deletedTask);
-      this.saveTasks();
+      // this.saveTasks();
     },
     deleteDeletedTask(index) {
       this.deletedTasks.splice(index, 1);
-      this.saveTasks();
+      // this.saveTasks();
     },
-    saveTasks() {
-      localStorage.setItem('todos', JSON.stringify(this.todos));
-      localStorage.setItem('deletedTasks', JSON.stringify(this.deletedTasks));
-    },
+    // saveTasks() {
+    //   localStorage.setItem('todos', JSON.stringify(this.todos));
+    //   localStorage.setItem('deletedTasks', JSON.stringify(this.deletedTasks));
+    // },
     async refreshData() {
       axios.get(this.api_url + 'api/shoppinglist/GetNote').then((response) => {
         this.notes = response.data;
@@ -87,7 +87,7 @@ export default {
     }
   },
   mounted() {
-    this.refreshData(); 
+    this.refreshData();
   }
 };
 </script>
