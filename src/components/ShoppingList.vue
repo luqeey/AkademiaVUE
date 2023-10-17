@@ -17,14 +17,14 @@
         <h1>Deleted Tasks</h1>
       </div>
       <ul>
-        <li v-for="(deletedTodo, index) in deletedTasks" :key="index">
-          {{ deletedTodo.description }}
+        <li v-for="(todo, index) in deletedTasks" :key="index">
+          {{ todo.description }}
           <button @click="deleteDeletedTask(index)" class="delete_deleted_button">X</button>
         </li>
       </ul>
     </div>
     <div>
-      <li v-for="todo in todos" :key="todo.description">
+      <li v-for="todo in todos" :key="todo.id">
         <p>{{ todo.description }}</p>
       </li>
     </div>
@@ -65,8 +65,9 @@ export default {
       formData.append('task', newTodos)
 
       axios.post(this.api_url + 'api/shoppingapp/add', formData).then(
-        () => {
+        (response) => {
           this.refreshData()
+          console.log(response)
         }
       )
 
