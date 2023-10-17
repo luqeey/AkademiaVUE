@@ -4,35 +4,35 @@
       <h1>Nakupny zoznam</h1>
     </div>
 
-    <input v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
+    <input id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
     <button @click="addTodo" class="add_button">Add</button>
     <ul>
       <li v-for="(todo, index) in todos" :key="index">
-        {{ todo.text }}
+        {{ todo.description }}
         <button @click="deleteTask(index)" class="x_button">X</button>
       </li>
     </ul>
     <div class="deleted_tasks">
-      <div class="heading2">
+      <div class="heading">
         <h1>Deleted Tasks</h1>
       </div>
       <ul>
-        <li v-for="(task, index) in deletedTasks" :key="index">
-          {{ task.text }}
+        <li v-for="(deletedTodo, index) in deletedTasks" :key="index">
+          {{ deletedTodo.description }}
           <button @click="deleteDeletedTask(index)" class="delete_deleted_button">X</button>
         </li>
       </ul>
     </div>
     <div>
-      <li v-for="note in notes" :key="note.id">
-        <p>{{ note.description }}</p>
+      <li v-for="todo in todos" :key="todo.description">
+        <p>{{ todo.description }}</p>
       </li>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from 'axios'
 
 export default {
   name: 'HelloWorld',
@@ -44,8 +44,7 @@ export default {
       newTodo: '',
       todos: [],
       deletedTasks: [],
-      api_url: 'http://localhost:5038/',
-      notes: []
+      api_url: 'http://localhost:5038/'
     };
   },
   // created() {
@@ -60,20 +59,39 @@ export default {
   //   }
   // },
   methods: {
-    addTodo() {
+    async addTodo() {
+      var newTodos = document.getElementById('task')
+      const formData = new FormData()
+      formData.append('task', newTodos)
+
+      axios.post(this.api_url + 'api/shoppingapp/add', formData).then(
+        () => {
+          this.refreshData()
+        }
+      )
+
       if (this.newTodo.trim() !== '') {
-        this.todos.push({ text: this.newTodo });
-        this.newTodo = '';
+        this.todos.push({ description: this.newTodo })
+        this.newTodo = ''
         // this.saveTasks();
       }
     },
-    deleteTask(index) {
-      const deletedTask = this.todos.splice(index, 1)[0];
-      this.deletedTasks.push(deletedTask);
-      // this.saveTasks();
+    async deleteTask(index, id) {
+      const deletedTask = this.todos.splice(index, id, 1)[0]
+      this.deletedTasks.push(deletedTask)
+
+      axios.delete(this.api_url + 'api/shoppingapp/delete', { params: { index, id } }).then(() => {
+        this.refreshData();
+      });
+
+      if (this.newTodo.trim() !== '') {
+        this.todos.push({ description: this.newTodo })
+        this.newTodo = ''
+        // this.saveTasks();
+      }
     },
     deleteDeletedTask(index) {
-      this.deletedTasks.splice(index, 1);
+      this.deletedTasks.splice(index, 1)
       // this.saveTasks();
     },
     // saveTasks() {
@@ -82,7 +100,7 @@ export default {
     // },
     async refreshData() {
       axios.get(this.api_url + 'api/shoppinglist/GetNote').then((response) => {
-        this.notes = response.data;
+        this.todos = response.data;
       });
     }
   },
@@ -117,10 +135,6 @@ a {
   color: antiquewhite;
 }
 
-.heading2 {
-  color: antiquewhite ;
-}
-
 .input_task {
   padding: 10px;  
   border-radius: 8px;
@@ -128,20 +142,14 @@ a {
 } 
 
 .add_button {
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 10px 15px;
   border-radius: 8px;
   border: none;
   margin: 15px  
 }
 
 .x_button {
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding: 2px 5px;
   border: none;
   border-radius: 2px;
   margin-left: 15px;
@@ -152,10 +160,7 @@ a {
 }
 
 .delete_deleted_button {
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding: 2px 5px;
   border: none;
   border-radius: 2px;
   margin-left: 15px;
