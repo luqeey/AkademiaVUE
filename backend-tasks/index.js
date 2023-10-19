@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectID } = require('mongodb'); // Import ObjectID from mongodb
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
@@ -13,18 +13,14 @@ const database_name = "shoppinglist";
 let database;
 
 app.listen(5038, () => {
-    MongoClient.connect(connection_string, { useUnifiedTopology: true })
+    MongoClient.connect(connection_string)
         .then((client) => {
             database = client.db(database_name);
             console.log("MongoDB connection successful");
-            startApp();
         })
         .catch((error) => {
             console.error("MongoDB connection error:", error);
         });
-});
-
-function startApp() {
 
     app.get('/api/shoppinglist/GetNote', (request, response) => {
         if (database) {
@@ -41,25 +37,35 @@ function startApp() {
         }
     });
 
-}
+    app.post('/api/shoppingapp/add', (request, response) => {
+        if (database) {
+            const newItem = request.body; // Assuming you're sending the new item in the request body
+            database.collection('shoppinglistcollection').insertOne(newItem)
+                .then(() => {
+                    response.json('Item added successfully');
+                })
+                .catch((error) => {
+                    console.error("MongoDB query error:", error);
+                    response.status(500).send("Error adding item");
+                });
+        } else {
+            response.status(500).send("Database not initialized");
+        }
+    });
 
-app.post('/api/shoppingapp/add', multer().none(),(request, response) => {
-    database.collection('shoppinglistcollection').count({}, function(error,numOfDocs) {
-        database.collection('shoppinglistcollection').insertOne({
-            id:(numOfDocs+1).toString(),
-            description: request.body.newNotes
-        })
-        response.json('added succesfully')
-    })
-})
-
-app.delete('/api/shoppingapp/delete', (request, response) => {
-    database.collection('shoppinglistcollection').deleteOne({
-        id: request.query.id,
-    })
-    response.json('deleted succesfully')
-})
-
-
-
-
+    app.delete('/api/shoppingapp/delete', (request, response) => {
+        if (database) {
+            const itemId = request.query.id;
+            database.collection('shoppinglistcollection').deleteOne({ _id: ObjectID(itemId) })
+                .then(() => {
+                    response.json('Item deleted successfully');
+                })
+                .catch((error) => {
+                    console.error("MongoDB query error:", error);
+                    response.status(500).send("Error deleting item");
+                });
+        } else {
+            response.status(500).send("Database not initialized");
+        }
+    });
+});

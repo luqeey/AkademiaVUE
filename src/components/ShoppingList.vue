@@ -4,12 +4,16 @@
       <h1>Nakupny zoznam</h1>
     </div>
 
-    <input id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
+    <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
     <button @click="addTodo" class="add_button">Add</button>
     <ul>
-      <li v-for="(todo, index) in todos" :key="index">
+      <!-- <li v-for="(todo, index) in todos" :key="todo">
+        <p>{{ todo.description }}</p>
+        <button @click="deleteTask(index, id)" class="x_button">X</button>
+      </li> -->
+      <li v-for="(todo, index) in todos" :key="todo.id">
         {{ todo.description }}
-        <button @click="deleteTask(index)" class="x_button">X</button>
+        <button @click="deleteTask(index, todo.id)" class="x_button">X</button>
       </li>
     </ul>
     <div class="deleted_tasks">
@@ -19,14 +23,14 @@
       <ul>
         <li v-for="(todo, index) in deletedTasks" :key="index">
           {{ todo.description }}
-          <button @click="deleteDeletedTask(index)" class="delete_deleted_button">X</button>
+          <button @click="deleteDeletedTask(index, id)" class="delete_deleted_button">X</button>
         </li>
       </ul>
     </div>
     <div>
-      <li v-for="todo in todos" :key="todo.id">
+      <!-- <li v-for="todo in todos" :key="todo.id">
         <p>{{ todo.description }}</p>
-      </li>
+      </li> -->
     </div>
   </div>
 </template>
@@ -41,7 +45,7 @@ export default {
   },
   data() {
     return {
-      newTodo: '',
+      newTodo: null,
       todos: [],
       deletedTasks: [],
       api_url: 'http://localhost:5038/'
@@ -59,38 +63,55 @@ export default {
   //   }
   // },
   methods: {
-    async addTodo() {
-      var newTodos = document.getElementById('task')
-      const formData = new FormData()
-      formData.append('task', newTodos)
+    generateRandomId() {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let randomId = '';
+      const idLength = 8; // You can adjust the length as needed
 
-      axios.post(this.api_url + 'api/shoppingapp/add', formData).then(
-        (response) => {
-          this.refreshData()
-          console.log(response)
-        }
-      )
-
-      if (this.newTodo.trim() !== '') {
-        this.todos.push({ description: this.newTodo })
-        this.newTodo = ''
-        // this.saveTasks();
+      for (let i = 0; i < idLength; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomId += characters.charAt(randomIndex);
       }
+
+      return randomId;
+    }, 
+    async addTodo() {
+      if (this.newTodo !== '') {
+              this.todos.push({ description: this.newTodo, id: this.generateRandomId() })
+
+              try {
+                await axios.post(`http://localhost:5038/api/shoppingapp/add`,{ description: this.newTodo, id: this.generateRandomId() }).then(
+                (response) => {
+                  console.log("Response:", response)
+                  this.refreshData()
+                }
+              ) 
+              } catch(error) {
+                console.error('error:', error)
+              }
+              this.newTodo = ''
+            }
+
+      
     },
     async deleteTask(index, id) {
-      const deletedTask = this.todos.splice(index, id, 1)[0]
-      this.deletedTasks.push(deletedTask)
+      const deletedTask = this.todos.splice(index, 1)[0];
+      console.log(deletedTask);
+      this.deletedTasks.push(deletedTask, {description: this.todo, id});
 
-      axios.delete(this.api_url + 'api/shoppingapp/delete', { params: { index, id } }).then(() => {
+      try {
+        await axios.delete(this.api_url + 'api/shoppingapp/delete/', { params: { id } });
         this.refreshData();
-      });
+      } catch (error) {
+        console.error('error:', error);
+      }
 
-      if (this.newTodo.trim() !== '') {
-        this.todos.push({ description: this.newTodo })
-        this.newTodo = ''
-        // this.saveTasks();
+      if (this.newTodo !== '') {
+        this.todos.push({ description: this.newTodo, id });
+        this.newTodo = '';
       }
     },
+
     deleteDeletedTask(index) {
       this.deletedTasks.splice(index, 1)
       // this.saveTasks();
@@ -101,7 +122,7 @@ export default {
     // },
     async refreshData() {
       axios.get(this.api_url + 'api/shoppinglist/GetNote').then((response) => {
-        this.todos = response.data;
+        this.todos = response.data
       });
     }
   },
