@@ -4,34 +4,31 @@
       <h1>Nakupny zoznam</h1>
     </div>
 
-    <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
-    <button @click="addTodo" class="add_button">Add</button>
-    <ul>
-      <!-- <li v-for="(todo, index) in todos" :key="todo">
-        <p>{{ todo.description }}</p>
-        <button @click="deleteTask(index, id)" class="x_button">X</button>
-      </li> -->
-      <li v-for="(todo, index) in todos" :key="todo.id">
-        {{ todo.description }}
-        <button @click="deleteTask(index, todo.id)" class="x_button">X</button>
-      </li>
-    </ul>
-    <div class="deleted_tasks">
-      <div class="heading">
-        <h1>Deleted Tasks</h1>
-      </div>
+    <template v-if="!shoppingLists">
+      <p>Nacitavam data</p>
+    </template>
+
+    <template v-else-if="shoppingLists.error">
+      <p>Pri načítaní dát nastala chyba: {{ shoppingLists.error }}</p>
+    </template>
+
+    <template v-else>
+      <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
+      <button @click="addTodo" class="add_button">Add</button>
       <ul>
-        <li v-for="(todo, index) in deletedTasks" :key="index">
-          {{ todo.description }}
-          <button @click="deleteDeletedTask(index, id)" class="delete_deleted_button">X</button>
+        <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainIndex">
+          <div class="item-container">
+            <p class="item_title">{{ mainItem.title }}</p>
+            <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
+            <ul>
+              <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex">
+                <div class="item_names">{{ subItem.name }}</div>
+              </li>
+            </ul>
+          </div>
         </li>
       </ul>
-    </div>
-    <div>
-      <!-- <li v-for="todo in todos" :key="todo.id">
-        <p>{{ todo.description }}</p>
-      </li> -->
-    </div>
+    </template>
   </div>
 </template>
 
@@ -41,96 +38,57 @@ import axios from 'axios'
 export default {
   name: 'HelloWorld',
   props: {
-    msg: String
+    msg: String,
   },
   data() {
     return {
       newTodo: null,
       todos: [],
       deletedTasks: [],
-      api_url: 'http://localhost:5038/'
+      shoppingLists: null,
     };
   },
-  // created() {
-  //   const savedTodos = localStorage.getItem('todos');
-  //   if (savedTodos) {
-  //     this.todos = JSON.parse(savedTodos);
-  //   }
-
-  //   const savedDeletedTasks = localStorage.getItem('deletedTasks');
-  //   if (savedDeletedTasks) {
-  //     this.deletedTasks = JSON.parse(savedDeletedTasks);
-  //   }
-  // },
   methods: {
-    generateRandomId() {
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let randomId = '';
-      const idLength = 8; // You can adjust the length as needed
+    // generateRandomId() {
+    //   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    //   let randomId = '';
+    //   const idLength = 8;
 
-      for (let i = 0; i < idLength; i++) {
-        const randomIndex = Math.floor(Math.random() * characters.length);
-        randomId += characters.charAt(randomIndex);
-      }
+    //   for (let i = 0; i < idLength; i++) {
+    //     const randomIndex = Math.floor(Math.random() * characters.length);
+    //     randomId += characters.charAt(randomIndex);
+    //   }
 
-      return randomId;
-    }, 
-    async addTodo() {
+    //   return randomId;
+    // },
+    addTodo() {
       if (this.newTodo !== '') {
-              this.todos.push({ description: this.newTodo, id: this.generateRandomId() })
-
-              try {
-                await axios.post(`http://localhost:5038/api/shoppingapp/add`,{ description: this.newTodo, id: this.generateRandomId() }).then(
-                (response) => {
-                  console.log("Response:", response)
-                  this.refreshData()
-                }
-              ) 
-              } catch(error) {
-                console.error('error:', error)
-              }
-              this.newTodo = ''
-            }
-
-      
-    },
-    async deleteTask(index, id) {
-      const deletedTask = this.todos.splice(index, 1)[0];
-      console.log(deletedTask);
-      this.deletedTasks.push(deletedTask, {description: this.todo, id});
-
-      try {
-        await axios.delete(this.api_url + 'api/shoppingapp/delete/', { params: { id } });
-        this.refreshData();
-      } catch (error) {
-        console.error('error:', error);
-      }
-
-      if (this.newTodo !== '') {
-        this.todos.push({ description: this.newTodo, id });
+        // const randomId = this.generateRandomId();
+        const newMainItem = {
+          title: this.newTodo,
+          items: [],
+        };
+        this.shoppingLists.push(newMainItem);
         this.newTodo = '';
       }
     },
-
-    deleteDeletedTask(index) {
-      this.deletedTasks.splice(index, 1)
-      // this.saveTasks();
+    deleteMainItem(mainIndex) {
+      this.shoppingLists.splice(mainIndex, 1);
     },
-    // saveTasks() {
-    //   localStorage.setItem('todos', JSON.stringify(this.todos));
-    //   localStorage.setItem('deletedTasks', JSON.stringify(this.deletedTasks));
-    // },
-    async refreshData() {
-      axios.get(this.api_url + 'api/shoppinglist/GetNote').then((response) => {
-        this.todos = response.data
-      });
+  },
+  async mounted() {
+    try {
+      const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists');
+      this.shoppingLists = shoppingLists;
+      console.log(shoppingLists);
+    } catch (error) {
+      console.error('Error:', error);
+      this.shoppingLists = { error };
     }
   },
-  mounted() {
-    this.refreshData();
-  }
 };
 </script>
+
 
 
 <style>
@@ -195,5 +153,18 @@ a {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.item_title {
+  font-size: 25px;
+  color: white;
+}
+
+.item_names {
+  margin: 0px;
+}
+
+.item-container {
+  margin-bottom: 10px;
 }
 </style>
