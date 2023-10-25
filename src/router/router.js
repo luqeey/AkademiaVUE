@@ -7,7 +7,7 @@ const routes = [
       component: () => import('@/components/ShoppingList.vue')
     },
     {
-      path: '/detail',
+      path: '/shopping-list/:id',
       name: 'Detail ',
       component: () => import('@/components/ShoppingDetail.vue')
     }

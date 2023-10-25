@@ -18,7 +18,11 @@
       <ul>
         <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainIndex">
           <div class="item-container">
-            <p class="item_title">{{ mainItem.title }}</p>
+            <a href="'/shopping-list/' + mainItem.id" @click.prevent="navigate(mainItem)">
+              <p class="item_title">
+                {{ mainItem.title }}
+              </p>
+            </a>
             <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
             <ul>
               <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex">
@@ -43,38 +47,40 @@ export default {
   data() {
     return {
       newTodo: null,
-      todos: [],
-      deletedTasks: [],
       shoppingLists: null,
     };
   },
   methods: {
-    // generateRandomId() {
-    //   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //   let randomId = '';
-    //   const idLength = 8;
-
-    //   for (let i = 0; i < idLength; i++) {
-    //     const randomIndex = Math.floor(Math.random() * characters.length);
-    //     randomId += characters.charAt(randomIndex);
-    //   }
-
-    //   return randomId;
-    // },
-    addTodo() {
-      if (this.newTodo !== '') {
-        // const randomId = this.generateRandomId();
-        const newMainItem = {
+    async addTodo() {
+    if (this.newTodo !== '') {
+      try {
+        const newMainTask = await axios.post('/api/v1/shopping-lists', {
           title: this.newTodo,
-          items: [],
-        };
-        this.shoppingLists.push(newMainItem);
+        });
+        
+        const newTask = newMainTask.data;
+        this.shoppingLists.push(newTask);
+
         this.newTodo = '';
+      } catch (error) {
+        console.error('Error adding task:', error);
       }
-    },
-    deleteMainItem(mainIndex) {
+    }
+  },
+  async deleteMainItem(mainIndex) {
+    const taskToDelete = this.shoppingLists[mainIndex];
+    
+    try {
+      await axios.delete(`/api/v1/shopping-lists/${taskToDelete.id}`);
       this.shoppingLists.splice(mainIndex, 1);
-    },
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  },
+  navigate(mainItem) {
+  console.log(mainItem.id);
+  this.$router.push({ name: 'Detail', params: { id: mainItem.id } });
+}
   },
   async mounted() {
     try {
