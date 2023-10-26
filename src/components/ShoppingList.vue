@@ -16,9 +16,9 @@
       <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
       <button @click="addTodo" class="add_button">Add</button>
       <ul>
-        <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainIndex">
+        <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id">
           <div class="item-container">
-            <a href="'/shopping-list/' + mainItem.id" @click.prevent="navigate(mainItem)">
+            <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
               <p class="item_title">
                 {{ mainItem.title }}
               </p>
@@ -40,7 +40,7 @@
 import axios from 'axios'
 
 export default {
-  name: 'HelloWorld',
+  name: 'ShoppingList',
   props: {
     msg: String,
   },
@@ -50,46 +50,47 @@ export default {
       shoppingLists: null,
     };
   },
+  async mounted() {
+    try {
+      const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists');
+      this.shoppingLists = shoppingLists;
+      console.log(this.shoppingLists)
+    } catch (error) {
+      console.error('Error:', error);
+      this.shoppingLists = { error };
+    }
+  }, 
   methods: {
     async addTodo() {
-    if (this.newTodo !== '') {
+      if (this.newTodo == '') return
+      
       try {
         const newMainTask = await axios.post('/api/v1/shopping-lists', {
           title: this.newTodo,
         });
         
-        const newTask = newMainTask.data;
+        const newTask = newMainTask.data.data;
         this.shoppingLists.push(newTask);
 
+        console.log(this.shoppingLists)
         this.newTodo = '';
       } catch (error) {
         console.error('Error adding task:', error);
       }
-    }
-  },
-  async deleteMainItem(mainIndex) {
-    const taskToDelete = this.shoppingLists[mainIndex];
-    
-    try {
-      await axios.delete(`/api/v1/shopping-lists/${taskToDelete.id}`);
-      this.shoppingLists.splice(mainIndex, 1);
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
-  },
-  navigate(mainItem) {
-  console.log(mainItem.id);
-  this.$router.push({ name: 'Detail', params: { id: mainItem.id } });
-}
-  },
-  async mounted() {
-    try {
-      const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists');
-      this.shoppingLists = shoppingLists;
-      console.log(shoppingLists);
-    } catch (error) {
-      console.error('Error:', error);
-      this.shoppingLists = { error };
+    },
+    async deleteMainItem(mainIndex) {
+      const taskToDelete = this.shoppingLists[mainIndex];
+      
+      try {
+        await axios.delete(`/api/v1/shopping-lists/${taskToDelete.id}`);
+        this.shoppingLists.splice(mainIndex, 1);
+      } catch (error) {
+        console.error('Error deleting task:', error);
+      }
+    },
+    navigate(mainItem) {
+      console.log(mainItem.id);
+      this.$router.push({ name: 'Detail', params: { id: mainItem.id } });
     }
   },
 };
