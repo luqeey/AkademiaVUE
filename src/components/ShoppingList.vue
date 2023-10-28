@@ -1,7 +1,19 @@
 <template>
   <div class="hello">
-    <div class="heading">
-      <h1>Nakupny zoznam</h1>
+    <div>
+      <div class="heading">
+        <h1>Nakupny zoznam</h1>
+          <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
+          <button @click="addTodo" class="add_button">Add</button>
+          <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id" class="choose_task">
+        <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
+          <p>
+            {{ mainItem.title }}
+            <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
+          </p>
+        </a>
+      </li>
+      </div>
     </div>
 
     <template v-if="!shoppingLists">
@@ -13,8 +25,6 @@
     </template>
 
     <template v-else>
-      <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
-      <button @click="addTodo" class="add_button">Add</button>
       <ul>
         <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id">
           <div class="item-container">
@@ -115,11 +125,15 @@ li {
   color: antiquewhite;
 }
 a {
-  color: #42b983;
+  color: white;
+  text-decoration: none;
+
 }
 
 .heading {
   color: antiquewhite;
+  text-align: left;
+  margin-left: 48px;
 }
 
 .input_task {
@@ -157,7 +171,7 @@ a {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
+
   color: #2c3e50;
   margin-top: 60px;
 }
@@ -173,5 +187,9 @@ a {
 
 .item-container {
   margin-bottom: 10px;
+}
+
+.choose_task {
+  text-align: left;
 }
 </style>

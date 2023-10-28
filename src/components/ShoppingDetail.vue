@@ -5,9 +5,12 @@
     </div>
     <div class="detail_tasks">
       <input type="text" v-model="detailTodo" class="detail_task" placeholder="Add a new item" @keyup.enter="addDetail">
-        <ul v-if="mainItem && mainItem.items">
-          <li v-for="(item, index) in mainItem.items" :key="index">{{ item.name }}</li>
-        </ul>
+      <button @click="addDetail" class="detail_button">Add</button>
+      <ul v-if="mainItem && mainItem.items">
+        <li v-for="(item, index) in mainItem.items" :key="index">{{ item.name }}
+          <button @click="deleteItem(index)" class="x_item_button">X</button>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -20,16 +23,16 @@ export default {
   data() {
     return {
       mainItem: null,
-      detailTodo: [],
+      detailTodo: '', 
     }
   },
   async mounted() {
     try {
-      const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists')
-      this.mainItem = shoppingLists.find(({ id }) => id == this.$route.params.id)
+      const { data: { data: shoppingLists } } = await axios.get('/api/v1/shopping-lists');
+      this.mainItem = shoppingLists.find(({ id }) => id == this.$route.params.id);
     } catch (error) {
-      console.error('Error:', error)
-      this.mainItem = { error }
+      console.error('Error:', error);
+      this.mainItem = { error };
     }
   },
   methods: {
@@ -37,25 +40,39 @@ export default {
       if (this.detailTodo === '') return;
 
       try {
-        const itemId = this.mainItem.id;
-        console.log(itemId)
-        const newItem = await axios.post(`/api/v1/shopping-lists/${this.$route.params.id}/items/${ itemId }`, {
+        const newItemData = {
           name: this.detailTodo,
-        });
+          value: 0,
+          unit: 'units',
+          is_checked: false,
+        };
+
+        const response = await axios.post(`/api/v1/shopping-lists/${this.$route.params.id}/items`, newItemData);
 
         if (!this.mainItem.items) {
           this.mainItem.items = [];
         }
 
-        this.mainItem.items.push(newItem.data.data);
+        this.mainItem.items.push(response.data.data);
         this.detailTodo = '';
       } catch (error) {
         console.error('Error adding item:', error);
+      }
+    }, 
+    async deleteItem(index) {
+      const itemToDelete = this.mainItem.items[index]
+
+      try {
+        await axios.delete(`/api/v1/shopping-lists/${this.mainItem.id}/items/${itemToDelete.id}`)
+        this.mainItem.items.splice(index, 1)
+      } catch (error) {
+        console.error('Error deleting item:', error)
       }
     }
   }
 }
 </script>
+
 
 
 
