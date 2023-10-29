@@ -1,48 +1,52 @@
 <template>
-  <div class="hello">
-    <div>
+  <div>
+    <div class="left-content">
       <div class="heading">
         <h1>Nakupny zoznam</h1>
-          <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
-          <button @click="addTodo" class="add_button">Add</button>
+        <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
+        <button @click="addTodo" class="add_button">Add</button>
+        <ul>
           <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id" class="choose_task">
-        <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
-          <p>
-            {{ mainItem.title }}
-            <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
-          </p>
-        </a>
-      </li>
-      </div>
-    </div>
-
-    <template v-if="!shoppingLists">
-      <p>Nacitavam data</p>
-    </template>
-
-    <template v-else-if="shoppingLists.error">
-      <p>Pri načítaní dát nastala chyba: {{ shoppingLists.error }}</p>
-    </template>
-
-    <template v-else>
-      <ul>
-        <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id">
-          <div class="item-container">
             <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
-              <p class="item_title">
+              <p>
                 {{ mainItem.title }}
+                <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
               </p>
             </a>
-            <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
-            <ul>
-              <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex">
-                <div class="item_names">{{ subItem.name }}</div>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-    </template>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="right-content">
+      <template v-if="!shoppingLists">
+        <p>Nacitavam data</p>
+      </template>
+
+      <template v-else-if="shoppingLists.error">
+        <p>Pri načítaní dát nastala chyba: {{ shoppingLists.error }}</p>
+      </template>
+
+      <template v-else>
+        <ul>
+          <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id">
+            <div class="item-container">
+              <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
+                <p class="item_title">
+                  {{ mainItem.title }}
+                  <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
+                </p>
+              </a>
+              
+              <ul>
+                <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex">
+                  <div class="item_names">{{ subItem.name }}</div>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -115,25 +119,25 @@ h3 {
 ul {
   list-style: none;
   text-align: center;
+  justify-content: center;
   padding: 0;
 }
 li {
+
   display: flex;
   align-items: center;
-  justify-content: center;
   padding: 5px;
   color: antiquewhite;
+  
 }
 a {
   color: white;
   text-decoration: none;
-
 }
 
 .heading {
   color: antiquewhite;
   text-align: left;
-  margin-left: 48px;
 }
 
 .input_task {
@@ -146,7 +150,7 @@ a {
   padding: 10px 15px;
   border-radius: 8px;
   border: none;
-  margin: 15px  
+  margin: 15px;
 }
 
 .x_button {
@@ -171,25 +175,36 @@ a {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  color: #2c3e50;
-  margin-top: 60px;
 }
 
 .item_title {
   font-size: 25px;
   color: white;
+  justify-content: center;
 }
 
 .item_names {
-  margin: 0px;
+  margin: 0;
 }
 
 .item-container {
   margin-bottom: 10px;
+  text-align: center; 
+  max-width: 600px;
 }
 
-.choose_task {
-  text-align: left;
+.left-content {
+  float: left;
+  width: 30%;
+  padding-left: 38px;
+  box-sizing: border-box;
+  border-width: 4px;
+}
+
+.right-content {
+  float: right;
+  width: 70%;
+  padding: 10px;
+  box-sizing: border-box;
 }
 </style>
