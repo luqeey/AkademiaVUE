@@ -2,17 +2,15 @@
   <div>
     <div class="left-content">
       <div class="heading">
-        <h1>Nakupny zoznam</h1>
+        <h1>Shopping List</h1>
         <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
         <button @click="addTodo" class="add_button">Add</button>
         <ul>
           <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id" class="choose_task">
             <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
-              <p>
-                {{ mainItem.title }}
-                <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
-              </p>
+              {{ mainItem.title }}
             </a>
+            <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
           </li>
         </ul>
       </div>
@@ -27,22 +25,26 @@
       </template>
 
       <template v-else>
+        <div class="heading_right">
+          <h1>
+            All Tasks
+          </h1>
+        </div>
         <ul>
           <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id">
             <div class="item-container">
-              <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
-                <p class="item_title">
+              <p class="item_title">
+                <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
                   {{ mainItem.title }}
-                  <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
-                </p>
-              </a>
-              
+                </a>
+                <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
+              </p>
               <ul>
-                <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex">
-                  <div class="item_names">{{ subItem.name }}</div>
+                <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex" class="item_names">
+                  {{ subItem.name }}
                 </li>
               </ul>
-            </div>
+            </div>  
           </li>
         </ul>
       </template>
@@ -191,6 +193,11 @@ a {
   margin-bottom: 10px;
   text-align: center; 
   max-width: 600px;
+  margin-left: 50px;
+  border-style: solid;
+  border-width: 10px;
+  border-color: black;
+  padding-right: 500px;
 }
 
 .left-content {
@@ -198,13 +205,27 @@ a {
   width: 30%;
   padding-left: 38px;
   box-sizing: border-box;
-  border-width: 4px;
+  padding-bottom: 100vh;
+  border-style: solid;
+  border-width: 10px;
+  border-radius: 15px;
+  border-color: black;
 }
 
 .right-content {
   float: right;
   width: 70%;
-  padding: 10px;
   box-sizing: border-box;
+}
+
+.choose_task {
+  margin-top: 10px;
+}
+
+.heading_right {
+  margin-left: 55px;
+  border-style: solid;
+  border-width: 10px;
+  border-color: black;
 }
 </style>
