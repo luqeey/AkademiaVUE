@@ -19,8 +19,21 @@
       <div class="item-list">
         <ul v-if="mainItem && mainItem.items" class="item">
           <li v-for="(item, index) in mainItem.items" :key="index">
-            {{ item.name }}
+            <input type="checkbox" v-model="item.is_checked" @change="updateItemStatus(item)">
+            {{ item.name }} - 
+            <span v-if="!item.editing">{{ item.value }} {{ item.unit }}</span>
+            <span v-else>
+              <input type="text" v-model="item.value" placeholder="Value">
+                <select v-model="item.unit" class="detail_select">
+                  <option unit="package">Package</option>
+                  <option unit="piece">Piece</option>
+                  <option unit="grams">Grams</option>
+                  <option unit="kilograms">Kilograms</option>
+                </select>
+              <button @click="saveItemEdits(item)">Save</button>
+            </span>
             <button @click="deleteItem(index)" class="x_item_button">X</button>
+            <button @click="editItem(item)">Edit</button>
           </li>
         </ul>
       </div>
@@ -56,8 +69,8 @@ export default {
       try {
         const newItemData = {
           name: this.detailTodo,
-          value: 0,
-          unit: 'units',
+          value: 1,
+          unit: 'piece',
           is_checked: false,
         };
 
@@ -81,6 +94,32 @@ export default {
         this.mainItem.items.splice(index, 1)
       } catch (error) {
         console.error('Error deleting item:', error)
+      }
+    },
+    async updateItemStatus(item) {
+      try {
+        const response = await axios.put(`/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`, {
+          is_checked: item.is_checked
+        });
+        console.log(response)
+      } catch (error) {
+        console.error('Error updating item status:', error);
+      }
+    },
+    editItem(item) {
+      item.editing = true;
+    },
+    async saveItemEdits(item) {
+      try {
+        const response = await axios.put(`/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`, {
+          value: item.value,
+          unit: item.unit
+        });
+
+        console.log(response)
+        item.editing = false
+      } catch (error) {
+        console.error('Error saving item edits:', error)
       }
     }
   }
@@ -133,6 +172,39 @@ export default {
 
 .item {
   list-style: none;
+}
+
+.x_item_button {
+  padding: 2px 5px;
+  border: none;
+  border-radius: 2px;
+  margin-left: 15px;
+}
+
+.unit-select {
+  margin-left: 200px;
+}
+
+.units {
+  background-color: antiquewhite;
+  border-radius: 5px;
+  color: black;
+}
+
+.number_input {
+  padding: 7px;
+}
+
+.detail_select {
+  padding: 8px;
+}
+
+.values {
+  margin-left: 50px;
+}
+
+.units {
+  margin-left: 10px;
 }
 
 </style>
