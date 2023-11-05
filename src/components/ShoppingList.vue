@@ -10,7 +10,7 @@
             <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
               {{ mainItem.title }}
             </a>
-            <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
+            <button @click="deleteMainItem(mainIndex)" class="x_button_left">X</button>
           </li>
         </ul>
       </div>
@@ -27,24 +27,26 @@
       <template v-else>
         <div class="heading_right">
           <h1>
-            All Tasks
+            All Lists
           </h1>
         </div>
         <ul>
           <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id">
             <div class="item-container">
-              <p class="item_title">
-                <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
+              <div class="navigate_item">
+                <a :href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
+                <p class="item_title">
                   {{ mainItem.title }}
-                </a>
-                <button @click="deleteMainItem(mainIndex)" class="x_button">X</button>
-              </p>
+                </p>
+              </a>
+              <button @click="deleteMainItem(mainIndex)" class="x_button_right">X</button>
+              </div>
               <ul>
                 <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex" class="item_names">
                   {{ subItem.name }}
                 </li>
               </ul>
-            </div>  
+            </div>
           </li>
         </ul>
       </template>
@@ -138,7 +140,7 @@ a {
 }
 
 .heading {
-  color: antiquewhite;
+  color: white;
   text-align: left;
 }
 
@@ -155,23 +157,20 @@ a {
   margin: 15px;
 }
 
-.x_button {
+.x_button_left {
   padding: 2px 5px;
   border: none;
   border-radius: 2px;
-  margin-left: 15px;
+  margin-left: 60px;
 }
 
-.deleted_tasks {
-  margin-top: 200px;
-}
-
-.delete_deleted_button {
+.x_button_right {
   padding: 2px 5px;
   border: none;
   border-radius: 2px;
-  margin-left: 15px;
+  margin-left: 50px;
 }
+
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -181,23 +180,28 @@ a {
 
 .item_title {
   font-size: 25px;
-  color: white;
+  color: #111111;
   justify-content: center;
+  flex: 1;
+  margin-left: 15px;
 }
 
 .item_names {
-  margin: 0;
+  margin: 0px 0px 10px 10px;
+  color: #111111;
 }
 
 .item-container {
   margin-bottom: 10px;
   text-align: center; 
-  max-width: 600px;
   margin-left: 50px;
   border-style: solid;
-  border-width: 10px;
-  border-color: black;
+  border-width: 6px;
+  border-radius: 15px;
+  background-color: white;
+  border-color: #111111;
   padding-right: 500px;
+  color: #111111;
 }
 
 .left-content {
@@ -209,7 +213,8 @@ a {
   border-style: solid;
   border-width: 10px;
   border-radius: 15px;
-  border-color: black;
+  border-color: #111111;
+  background-color: #111111;
 }
 
 .right-content {
@@ -224,8 +229,11 @@ a {
 
 .heading_right {
   margin-left: 55px;
-  border-style: solid;
-  border-width: 10px;
-  border-color: black;
+  color: white;
+}
+
+.navigate_item {
+  display: flex;
+  align-items: center;
 }
 </style>

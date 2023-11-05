@@ -18,7 +18,7 @@
       </div>
       <div class="item-list">
         <ul v-if="mainItem && mainItem.items" class="item">
-          <li v-for="(item, index) in mainItem.items" :key="index">
+          <li v-for="(item, index) in mainItem.items" :key="index" class="items_description">
             <input type="checkbox" v-model="item.is_checked" @change="updateItemStatus(item)">
             {{ item.name }} - 
             <span v-if="!item.editing">{{ item.value }} {{ item.unit }}</span>
@@ -33,7 +33,7 @@
               <button @click="saveItemEdits(item)">Save</button>
             </span>
             <button @click="deleteItem(index)" class="x_item_button">X</button>
-            <button @click="editItem(item)">Edit</button>
+            <button @click="editItem(item)" class="edit_button" >Edit</button>
           </li>
         </ul>
       </div>
@@ -131,12 +131,18 @@ export default {
 
 <style>
 
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 .detail_title {
   color: antiquewhite;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 30px;
+  font-size: 40px;
 }
 
 .detail_tasks {
@@ -159,6 +165,8 @@ export default {
   border-radius: 8px;
   border: none;
   margin: 15px;
+  background-color: #111111;
+  color: white;
 }
 
 .input-container {
@@ -166,8 +174,14 @@ export default {
 }
 
 .item-list {
-  text-align: center;
-  margin-top: 10px;
+  margin: 30px 0px 10px 50px;
+  text-align: center; 
+  border-style: solid;
+  border-width: 6px;
+  border-radius: 15px;
+  background-color: white;
+  border-color: #111111;
+  color: #111111;
 }
 
 .item {
@@ -178,7 +192,7 @@ export default {
   padding: 2px 5px;
   border: none;
   border-radius: 2px;
-  margin-left: 15px;
+  margin-left: 60px;
 }
 
 .unit-select {
@@ -205,6 +219,19 @@ export default {
 
 .units {
   margin-left: 10px;
+}
+
+.edit_button {
+  margin: 0px 20px 10px 200px;
+  padding: 10px 15px;
+  border-style: none;
+  border-radius: 8px;
+  background-color: #111111;
+  color: white;
+}
+
+.items_description {
+  color: #111111;
 }
 
 </style>
