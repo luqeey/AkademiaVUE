@@ -21,7 +21,7 @@
           <li v-for="(item, index) in mainItem.items" :key="index" class="items_description">
             <input type="checkbox" v-model="item.is_checked" @change="updateItemStatus(item)">
             {{ item.name }} - 
-            <span v-if="!item.editing">{{ item.value }} {{ item.unit }}</span>
+            <span v-if="!item.editing"> {{ item.value }} {{ item.unit }}</span>
             <span v-else>
               <input type="text" v-model="item.value" placeholder="Value">
                 <select v-model="item.unit" class="detail_select">

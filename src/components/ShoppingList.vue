@@ -16,15 +16,15 @@
       </div>
     </div>
     <div class="right-content">
-      <template v-if="!shoppingLists">
+      <div v-if="!shoppingLists">
         <p>Nacitavam data</p>
-      </template>
+      </div>
 
-      <template v-else-if="shoppingLists.error">
+      <div v-else-if="shoppingLists.error">
         <p>Pri načítaní dát nastala chyba: {{ shoppingLists.error }}</p>
-      </template>
+      </div>
 
-      <template v-else>
+      <div v-else>
         <div class="heading_right">
           <h1>
             All Lists
@@ -36,20 +36,20 @@
               <div class="navigate_item">
                 <a :href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
                 <p class="item_title">
-                  {{ mainItem.title }}
+                  {{ mainItem.title }} 
                 </p>
               </a>
               <button @click="deleteMainItem(mainIndex)" class="x_button_right">X</button>
               </div>
-              <ul>
+              <ul class="item_interior">
                 <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex" class="item_names">
-                  {{ subItem.name }}
+                  {{ subItem.name }} - {{ mainItem.items[subIndex].value }} {{ mainItem.items[subIndex].unit }}
                 </li>
               </ul>
             </div>
           </li>
         </ul>
-      </template>
+      </div>
     </div>
   </div>
 </template>
@@ -194,14 +194,14 @@ a {
 .item-container {
   margin-bottom: 10px;
   text-align: center; 
-  margin-left: 50px;
+  margin-left: 55px;
   border-style: solid;
   border-width: 6px;
   border-radius: 15px;
   background-color: white;
   border-color: #111111;
-  padding-right: 500px;
   color: #111111;
+  width: 40rem; 
 }
 
 .left-content {
@@ -235,5 +235,9 @@ a {
 .navigate_item {
   display: flex;
   align-items: center;
+}
+
+.item_interior {
+  
 }
 </style>
