@@ -3,14 +3,15 @@
     <div class="left-content">
       <div class="heading">
         <h1>Shopping List</h1>
-        <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo" @keyup.enter="addTodo">
-        <button @click="addTodo" class="add_button">Add</button>
+        <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo"
+          @keyup.enter="addTodo">
+        <button @click="addTodo" class="add_button pointer">Add</button>
         <ul>
           <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id" class="choose_task">
-            <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
+            <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)" class="pointer">
               {{ mainItem.title }}
             </a>
-            <button @click="deleteMainItem(mainIndex)" class="x_button_left">X</button>
+            <button @click="deleteMainItem(mainIndex)" class="x_button_left pointer">X</button>
           </li>
         </ul>
       </div>
@@ -35,15 +36,17 @@
             <div class="item-container">
               <div class="navigate_item">
                 <a :href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
-                <p class="item_title">
-                  {{ mainItem.title }} 
-                </p>
-              </a>
-              <button @click="deleteMainItem(mainIndex)" class="x_button_right">X</button>
+                  <p class="item_title">
+                    {{ mainItem.title }}
+                  </p>
+                </a>
+                <button @click="deleteMainItem(mainIndex)" class="x_button_right pointer">X</button>
               </div>
               <ul class="item_interior">
                 <li v-for="(subItem, subIndex) in mainItem.items" :key="subIndex" class="item_names">
-                  {{ subItem.name }} - {{ mainItem.items[subIndex].value }} {{ mainItem.items[subIndex].unit }}
+                  <span :class="{'line_through' : subItem.is_checked}">
+                    {{ subItem.name }} - {{ mainItem.items[subIndex].value }} {{ mainItem.items[subIndex].unit }}
+                  </span>
                 </li>
               </ul>
             </div>
@@ -77,20 +80,31 @@ export default {
       console.error('Error:', error);
       this.shoppingLists = { error };
     }
-  }, 
+  },
+  computed: {
+    reversedShoppingLists() {
+      if (this.shoppingLists && this.shoppingLists.length > 0) {
+        console.log("reversed:", this.shoppingLists.slice().reverse())
+        return this.shoppingLists.slice().reverse();
+      }
+      return [];
+    },
+  },
   methods: {
     async addTodo() {
-      if (this.newTodo == '') return
-      
+      if (this.newTodo == '') return;
+
       try {
         const newMainTask = await axios.post('/api/v1/shopping-lists', {
           title: this.newTodo,
         });
-        
-        const newTask = newMainTask.data.data;
-        this.shoppingLists.push(newTask);
 
-        console.log(this.shoppingLists)
+        const newTask = newMainTask.data.data;
+
+        // Add to the beginning of the array
+        this.shoppingLists.unshift(newTask);
+        this.reversedShoppingLists.unshift(newTask);
+
         this.newTodo = '';
       } catch (error) {
         console.error('Error adding task:', error);
@@ -98,7 +112,7 @@ export default {
     },
     async deleteMainItem(mainIndex) {
       const taskToDelete = this.shoppingLists[mainIndex];
-      
+
       try {
         await axios.delete(`/api/v1/shopping-lists/${taskToDelete.id}`);
         this.shoppingLists.splice(mainIndex, 1);
@@ -120,20 +134,23 @@ export default {
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style: none;
   text-align: center;
   justify-content: center;
   padding: 0;
 }
+
 li {
 
   display: flex;
   align-items: center;
   padding: 5px;
   color: antiquewhite;
-  
+
 }
+
 a {
   color: white;
   text-decoration: none;
@@ -145,10 +162,10 @@ a {
 }
 
 .input_task {
-  padding: 10px;  
+  padding: 10px;
   border-radius: 8px;
   border: none;
-} 
+}
 
 .add_button {
   padding: 10px 15px;
@@ -193,7 +210,7 @@ a {
 
 .item-container {
   margin-bottom: 10px;
-  text-align: center; 
+  text-align: center;
   margin-left: 55px;
   border-style: solid;
   border-width: 6px;
@@ -201,7 +218,7 @@ a {
   background-color: white;
   border-color: #111111;
   color: #111111;
-  width: 40rem; 
+  width: 40rem;
 }
 
 .left-content {
@@ -237,7 +254,12 @@ a {
   align-items: center;
 }
 
-.item_interior {
-  
+.pointer {
+  cursor: pointer;
 }
+
+.line_through {
+  text-decoration: line-through;
+}
+
 </style>
