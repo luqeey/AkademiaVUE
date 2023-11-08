@@ -8,7 +8,7 @@
         <button @click="addTodo" class="add_button pointer">Add</button>
         <ul>
           <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id" class="choose_task">
-            <a href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)" class="pointer">
+            <a :href="`/shopping-lists/${mainItem.id}`" @click.prevent="navigate(mainItem)" class="pointer">
               {{ mainItem.title }}
             </a>
             <button @click="deleteMainItem(mainIndex)" class="x_button_left pointer">X</button>

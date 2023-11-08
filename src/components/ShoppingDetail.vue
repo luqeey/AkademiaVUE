@@ -16,20 +16,24 @@
         <input type="text" v-model="detailTodo" class="detail_input" placeholder="Add a new item" @keyup.enter="addDetail">
         <button @click="addDetail" class="detail_button">Add</button>
       </div>
-      <div class="item-list">
+      <div class="item-list" v-if="mainItem && mainItem.items && mainItem.items.length > 0">
         <ul v-if="mainItem && mainItem.items" class="item">
           <li v-for="(item, index) in mainItem.items" :key="index" class="items_description">
             <input type="checkbox" v-model="item.is_checked" @change="updateItemStatus(item)">
             {{ item.name }} - 
-            <span v-if="!item.editing"> {{ item.value }} {{ item.unit }}</span>
+            <span v-if="!item.editing"> {{ item.value }} {{ item.unit }} {{ item.customUnit }}</span>
             <span v-else>
               <input type="text" v-model="item.value" placeholder="Value">
-                <select v-model="item.unit" class="detail_select">
-                  <option unit="package">Package</option>
-                  <option unit="piece">Piece</option>
-                  <option unit="grams">Grams</option>
-                  <option unit="kilograms">Kilograms</option>
+              <div>
+                <select v-model="item.unit" class="detail-select" @change="unitChanged(item)">
+                  <option value="package">Package</option>
+                  <option value="piece">Piece</option>
+                  <option value="grams">Grams</option>
+                  <option value="kilograms">Kilograms</option>
+                  <option value="custom">Custom</option>
                 </select>
+                <input v-if="item.unit === 'custom'" v-model="item.customUnit" placeholder="Custom Unit" class="custom_input">
+              </div>
               <button @click="saveItemEdits(item)">Save</button>
             </span>
             <button @click="deleteItem(index)" class="x_item_button">X</button>
@@ -50,7 +54,13 @@ export default {
   data() {
     return {
       mainItem: null,
-      detailTodo: '', 
+      detailTodo: '',
+      unitOptions: [
+        { value: 'package', label: 'Package' },
+        { value: 'piece', label: 'Piece' },
+        { value: 'grams', label: 'Grams' },
+        { value: 'kilograms', label: 'Kilograms' },
+      ], 
     }
   },
   async mounted() {
@@ -121,7 +131,15 @@ export default {
       } catch (error) {
         console.error('Error saving item edits:', error)
       }
-    }
+    },
+    async unitChanged(item) {
+      if (item.unit === '') {
+        this.unitOptions = await axios.put(`/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`, {
+          unit: item.unit
+        });
+        item.customUnit = '';
+      }
+    },
   }
 }
 </script>
@@ -184,9 +202,6 @@ export default {
   color: #111111;
 }
 
-.item {
-  list-style: none;
-}
 
 .x_item_button {
   padding: 2px 5px;
@@ -222,7 +237,7 @@ export default {
 }
 
 .edit_button {
-  margin: 0px 20px 10px 200px;
+  margin: 0px 20px 10px 300px;
   padding: 10px 15px;
   border-style: none;
   border-radius: 8px;
