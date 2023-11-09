@@ -21,11 +21,11 @@
           <li v-for="(item, index) in mainItem.items" :key="index" class="items_description">
             <input type="checkbox" v-model="item.is_checked" @change="updateItemStatus(item)">
             {{ item.name }} - 
-            <span v-if="!item.editing"> {{ item.value }} {{ item.unit }} {{ item.customUnit }}</span>
+            <span v-if="!item.editing"> {{ item.value }} {{ item.unit === 'custom' ? item.customUnit : item.unit }} </span>
             <span v-else>
               <input type="text" v-model="item.value" placeholder="Value">
               <div>
-                <select v-model="item.unit" class="detail-select" @change="unitChanged(item)">
+                <select v-model="item.unit" class="detail-select">
                   <option value="package">Package</option>
                   <option value="piece">Piece</option>
                   <option value="grams">Grams</option>
@@ -123,21 +123,13 @@ export default {
       try {
         const response = await axios.put(`/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`, {
           value: item.value,
-          unit: item.unit
-        });
+          unit: item.unit === 'custom' ? item.customUnit : item.unit
+        })  
 
         console.log(response)
         item.editing = false
       } catch (error) {
         console.error('Error saving item edits:', error)
-      }
-    },
-    async unitChanged(item) {
-      if (item.unit === '') {
-        this.unitOptions = await axios.put(`/api/v1/shopping-lists/${this.$route.params.id}/items/${item.id}`, {
-          unit: item.unit
-        });
-        item.customUnit = '';
       }
     },
   }
@@ -192,7 +184,6 @@ export default {
 }
 
 .item-list {
-  margin: 30px 0px 10px 50px;
   text-align: center; 
   border-style: solid;
   border-width: 6px;
@@ -200,6 +191,8 @@ export default {
   background-color: white;
   border-color: #111111;
   color: #111111;
+  width: 80%;
+  padding: 1rem;
 }
 
 
@@ -207,7 +200,7 @@ export default {
   padding: 2px 5px;
   border: none;
   border-radius: 2px;
-  margin-left: 60px;
+  margin-left: auto;
 }
 
 .unit-select {
@@ -237,16 +230,29 @@ export default {
 }
 
 .edit_button {
-  margin: 0px 20px 10px 300px;
   padding: 10px 15px;
   border-style: none;
-  border-radius: 8px;
+  border-radius: 8px; 
   background-color: #111111;
   color: white;
+  margin-left: auto;
 }
 
 .items_description {
   color: #111111;
+  list-style-type: none;
+  justify-content: end;
+  align-items: center;
+  display: flex;
+  padding: 8px;
+  border: 1px solid gray;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+ul {
+  padding: 0 !important;
+  margin: 0;
 }
 
 </style>

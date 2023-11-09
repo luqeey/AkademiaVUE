@@ -3,7 +3,7 @@
     <div class="left-content">
       <div class="heading">
         <h1>Shopping List</h1>
-        <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new todo"
+        <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new list"
           @keyup.enter="addTodo">
         <button @click="addTodo" class="add_button pointer">Add</button>
         <ul>
