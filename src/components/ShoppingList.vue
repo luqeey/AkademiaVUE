@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="left-content">
+    <div class="left_content">
       <div class="heading">
         <h1>Shopping List</h1>
         <input autofocus id="task" v-model="newTodo" class="input_task" placeholder="Add a new list"
@@ -16,7 +16,7 @@
         </ul>
       </div>
     </div>
-    <div class="right-content">
+    <div class="right_content">
       <div v-if="!shoppingLists">
         <p>Nacitavam data</p>
       </div>
@@ -33,7 +33,7 @@
         </div>
         <ul>
           <li v-for="(mainItem, mainIndex) in shoppingLists" :key="mainItem.id">
-            <div class="item-container">
+            <div class="item_container">
               <div class="navigate_item">
                 <a :href="'/shopping-lists/' + mainItem.id" @click.prevent="navigate(mainItem)">
                   <p class="item_title">
@@ -101,7 +101,6 @@ export default {
 
         const newTask = newMainTask.data.data;
 
-        // Add to the beginning of the array
         this.shoppingLists.unshift(newTask);
         this.reversedShoppingLists.unshift(newTask);
 
@@ -131,6 +130,7 @@ export default {
 
 
 <style>
+
 h3 {
   margin: 40px 0 0;
 }
@@ -188,13 +188,6 @@ a {
   margin-left: 50px;
 }
 
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 .item_title {
   font-size: 25px;
   color: #111111;
@@ -208,7 +201,7 @@ a {
   color: #111111;
 }
 
-.item-container {
+.item_container {
   margin-bottom: 10px;
   text-align: center;
   margin-left: 55px;
@@ -221,7 +214,7 @@ a {
   width: 40rem;
 }
 
-.left-content {
+.left_content {
   float: left;
   width: 30%;
   padding-left: 38px;
@@ -234,7 +227,7 @@ a {
   background-color: #111111;
 }
 
-.right-content {
+.right_content {
   float: right;
   width: 70%;
   box-sizing: border-box;

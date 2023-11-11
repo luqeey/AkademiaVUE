@@ -12,29 +12,31 @@
       <p>{{ mainItem ? mainItem.title : 'Item not found' }}</p>
     </div>
     <div class="detail_tasks">
-      <div class="input-container">
+      <div>
         <input type="text" v-model="detailTodo" class="detail_input" placeholder="Add a new item" @keyup.enter="addDetail">
         <button @click="addDetail" class="detail_button">Add</button>
       </div>
-      <div class="item-list" v-if="mainItem && mainItem.items && mainItem.items.length > 0">
+      <div class="item_list" v-if="mainItem && mainItem.items && mainItem.items.length > 0">
         <ul v-if="mainItem && mainItem.items" class="item">
           <li v-for="(item, index) in mainItem.items" :key="index" class="items_description">
             <input type="checkbox" v-model="item.is_checked" @change="updateItemStatus(item)">
             {{ item.name }} - 
             <span v-if="!item.editing"> {{ item.value }} {{ item.unit === 'custom' ? item.customUnit : item.unit }} </span>
             <span v-else>
-              <input type="text" v-model="item.value" placeholder="Value">
-              <div>
-                <select v-model="item.unit" class="detail-select">
-                  <option value="package">Package</option>
-                  <option value="piece">Piece</option>
-                  <option value="grams">Grams</option>
-                  <option value="kilograms">Kilograms</option>
-                  <option value="custom">Custom</option>
-                </select>
-                <input v-if="item.unit === 'custom'" v-model="item.customUnit" placeholder="Custom Unit" class="custom_input">
+              <div class="specify_amount">
+                <input type="text" v-model="item.value" placeholder="Value" class="value_input">
+                <div>
+                  <select v-model="item.unit" class="detail_select">
+                    <option value="package">Package</option>
+                    <option value="piece">Piece</option>
+                    <option value="grams">Grams</option>
+                    <option value="kilograms">Kilograms</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                  <input v-if="item.unit === 'custom'" v-model="item.customUnit" placeholder="Custom Unit" class="custom_input">
+                </div>
+                <button @click="saveItemEdits(item)" class="save_button">Save</button>
               </div>
-              <button @click="saveItemEdits(item)">Save</button>
             </span>
             <button @click="deleteItem(index)" class="x_item_button">X</button>
             <button @click="editItem(item)" class="edit_button" >Edit</button>
@@ -141,12 +143,6 @@ export default {
 
 <style>
 
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 .detail_title {
   color: antiquewhite;
   display: flex;
@@ -179,11 +175,7 @@ export default {
   color: white;
 }
 
-.input-container {
-  text-align: center;
-}
-
-.item-list {
+.item_list {
   text-align: center; 
   border-style: solid;
   border-width: 6px;
@@ -201,32 +193,6 @@ export default {
   border: none;
   border-radius: 2px;
   margin-left: auto;
-}
-
-.unit-select {
-  margin-left: 200px;
-}
-
-.units {
-  background-color: antiquewhite;
-  border-radius: 5px;
-  color: black;
-}
-
-.number_input {
-  padding: 7px;
-}
-
-.detail_select {
-  padding: 8px;
-}
-
-.values {
-  margin-left: 50px;
-}
-
-.units {
-  margin-left: 10px;
 }
 
 .edit_button {
@@ -253,6 +219,38 @@ export default {
 ul {
   padding: 0 !important;
   margin: 0;
+}
+
+.save_button {
+  padding: 10px 15px;
+  border-style: none;
+  border-radius: 8px; 
+  background-color: #111111;
+  color: white;
+  margin-left: 10px;
+}
+
+.detail_select {
+  padding: 8px;
+  border-radius: 8px;
+  margin-left: 10px;
+}
+
+.custom_input {
+  padding: 8px;
+  border-radius: 8px;
+  margin-left: 10px;
+}
+
+.value_input {
+  padding: 8px;
+  border-radius: 8px;
+  margin-left: 10px;
+}
+
+.specify_amount {
+  display: flex;
+  align-items: center;
 }
 
 </style>
